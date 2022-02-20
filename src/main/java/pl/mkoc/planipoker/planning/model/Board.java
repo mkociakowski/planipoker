@@ -1,5 +1,6 @@
 package pl.mkoc.planipoker.planning.model;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -10,6 +11,8 @@ class Board {
 
     Board(UUID session) {
         this.session = session;
+        this.games = new HashSet<>();
+        this.players = new HashSet<>();
     }
 
     void registerPlayer(Player player) {

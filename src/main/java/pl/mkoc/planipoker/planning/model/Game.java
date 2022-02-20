@@ -1,5 +1,6 @@
 package pl.mkoc.planipoker.planning.model;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -16,6 +17,7 @@ class Game {
         this.title = title;
         this.description = description;
         this.deck = deck;
+        this.thrownCards = new HashSet<>();
     }
 
     void throwCard(Player player, Card card) {
@@ -23,7 +25,7 @@ class Game {
     }
 
     void changeCard(Player player, Card card) {
-        ;
+        throw new UnsupportedOperationException();
     }
 
     void finish() {
