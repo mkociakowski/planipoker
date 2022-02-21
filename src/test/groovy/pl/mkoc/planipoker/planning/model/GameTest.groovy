@@ -1,12 +1,13 @@
 package pl.mkoc.planipoker.planning.model
 
+import pl.mkoc.planipoker.kernel.DomainError
 import spock.lang.Specification
 
 class GameTest extends Specification {
-    def "player thrown with success card"() {
+    def "player thrown card with success"() {
         given:
         var deck = Mock(Deck)
-        var game = new Game("ZAD-1234", "", deck)
+        var game = new Game("TASK-1234", "", deck)
         var player = new Player("JohnQ")
         var card = new Card("2", 2)
         when:
@@ -15,21 +16,53 @@ class GameTest extends Specification {
         game.thrownCards.size() == 1
     }
 
-    def "player change his card with success - not implemented"() {
+    def "player can't throw card when game is finished"() {
         given:
         var deck = Mock(Deck)
-        var game = new Game("ZAD-1234", "", deck)
-        var player = new Player("John")
+        var game = new Game("TASK-1234", "", deck)
+        game.finish()
+        var player = new Player("JohnQ")
         var card = new Card("2", 2)
         when:
-        game.changeCard(player, card)
+        game.throwCard(player, card)
         then:
-        thrown(UnsupportedOperationException)
+        var e = thrown(DomainError)
+        e.code == PlanningErrors.GAME_FINISHED.name()
+    }
+
+    def "player change his card with success"() {
+        given:
+        var deck = Mock(Deck)
+        var game = new Game("TASK-1234", "", deck)
+        var player = new Player("John")
+        game.throwCard(player, new Card("2", 2))
+        game.throwCard(new Player("Mel"), new Card("2", 2))
+        when:
+        game.changeCard(player, new Card("3", 3))
+        then:
+        game.thrownCards.size() == 2
+        game.thrownCards.stream()
+                .anyMatch(tc -> tc.player == player && tc.card.name == "3")
+    }
+
+    def "player can't change his card when game is finished"() {
+        given:
+        var deck = Mock(Deck)
+        var game = new Game("TASK-1234", "", deck)
+        var player = new Player("John")
+        game.throwCard(player, new Card("2", 2))
+        game.throwCard(new Player("Mel"), new Card("2", 2))
+        game.finish()
+        when:
+        game.changeCard(player, new Card("3", 3))
+        then:
+        var e = thrown(DomainError)
+        e.code == PlanningErrors.GAME_FINISHED.name()
     }
 
     def "game is finished with success"() {
         given:
-        var game = new Game("ZAD-1234", "", Mock(Deck))
+        var game = new Game("TASK-1234", "", Mock(Deck))
         when:
         game.finish()
         then:

@@ -19,6 +19,10 @@ class Board {
         this.players.add(player);
     }
 
+    void removePlayer(Player player) {
+        this.players.removeIf(p -> p.equals(player));
+    }
+
     void newGame(Game game) {
         this.games.add(game);
     }
