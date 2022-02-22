@@ -1,7 +1,7 @@
 package pl.mkoc.planipoker.planning.model;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 class Game {
@@ -9,34 +9,48 @@ class Game {
     private String title;
     private String description;
     private Deck deck;
-    private Set<ThrownCard> thrownCards;
+    private Map<Player, Card> thrownCards;
     private boolean finished;
 
     Game(String title, String description, Deck deck) {
+        if (title == null || title.isEmpty()) {
+            throw PlanningErrors.GAME_TITLE_EMPTY.error();
+        }
+        if (deck == null) {
+            throw PlanningErrors.GAME_DECK_EMPTY.error();
+        }
+
         this.id = UUID.randomUUID();
+        this.thrownCards = new HashMap<>();
         this.title = title;
         this.description = description;
         this.deck = deck;
-        this.thrownCards = new HashSet<>();
     }
 
     void throwCard(Player player, Card card) {
-        if (this.finished) {
+        if (finished) {
             throw PlanningErrors.GAME_FINISHED.error();
         }
-        thrownCards.add(new ThrownCard(player, card));
+        if (thrownCards.containsKey(player)) {
+            throw PlanningErrors.GAME_PLAYER_ALREADY_THROW_CARD.error();
+        }
+        thrownCards.put(player, card);
     }
 
     void changeCard(Player player, Card card) {
-        if (this.finished) {
+        if (finished) {
             throw PlanningErrors.GAME_FINISHED.error();
         }
-        thrownCards.stream()
-                .filter(c -> c.getPlayer().equals(player))
-                .forEach(c -> c.changeCard(card));
+        if (!thrownCards.containsKey(player)) {
+            throw PlanningErrors.GAME_CHANGE_NOT_THROWN_CARD.error();
+        }
+        thrownCards.replace(player, card);
     }
 
     void finish() {
+        if (finished) {
+            throw PlanningErrors.GAME_FINISHED.error();
+        }
         this.finished = true;
     }
 }
