@@ -94,8 +94,8 @@
 				<executions>
 					<execution>
 						<goals>
-<!--							<goal>compile</goal>-->
-							<goal>compileTests</goal>
+							<goal>compile</goal>
+							<goal>compile-tests</goal>
 						</goals>
 					</execution>
 				</executions>
